@@ -1,109 +1,129 @@
-# AI Quiz Generator Frontend
+# 🚀 AI Quiz Generator 인수인계 문서
 
-## 인수인계 문서
+## 1. 프로젝트 개요
+**프로젝트명**: AI Quiz Generator  
+**설명**: Next.js(앱 라우터)와 TypeScript 기반 프론트엔드 애플리케이션으로, AI를 활용하여 영어 퀴즈(객관식, 텍스트→이미지 변환 등)를 생성·관리하고 사용자에게 CEFR 레벨에 따른 사전 테스트(Pretest)를 제공합니다.
 
-### 프로젝트 개요
-AI 기반 영어 레벨 테스트 및 관리(Admin) 페이지를 제공하는 Next.js 기반 프론트엔드 애플리케이션입니다.
-사용자는 퀴즈를 풀며 자신의 CEFR(유럽 공통 언어 기준) 레벨을 확인할 수 있고, 관리자는 섹션, 유닛, 스토리, 어휘, 퀴즈를 생성/관리할 수 있습니다.
+**주요 기능**:
+- **퀴즈 플레이어**: AI가 생성한 퀴즈를 순차적으로 제공하고, 정답 확인 및 점수 집계 → CEFR 레벨 산출
+- **퀴즈 유형 지원**: TEXT_TO_TEXT, TEXT_TO_IMAGE, IMAGE_TO_TEXT, DEFINITION_TO_IMAGE 모드
+- **관리자 대시보드(Admin Panel)**:
+  - **Generate Quiz**: CEFR 레벨과 유닛(Unit) 선택 후 AI 퀴즈 자동 생성
+  - **Manage Quiz**: 퀴즈 항목 직접 생성·수정·삭제(CRUD)
+  - **Manage Sections**: 섹션(Section) CRUD
+  - **Manage Units**: 유닛(Unit) CRUD
+  - **Manage Stories**: 스토리(Story) CRUD 및 AI 기반 스토리 생성
+  - **Manage Vocab**: 어휘(Vocabulary) CRUD
 
-### 주요 기능
-- 메인 페이지: 홈 화면 및 퀴즈 시작 버튼 제공
-- 퀴즈 플레이어: AI가 생성한 퀴즈를 풀어 점수 및 예상 레벨 확인
-- 관리자 대시보드:
-  - 섹션(Sections) 관리
-  - 유닛(Units) 관리
-  - 스토리(Stories) 관리 및 생성
-  - 어휘(Vocab) 관리
-  - 퀴즈(Quiz) 생성 및 관리
+## 2. 주요 라이브러리 설명
 
-### 기술 스택
-- Next.js (App Router)
-- React (Client 컴포넌트)
-- Tailwind CSS
-- Axios (HTTP 클라이언트)
-- TypeScript
+| 라이브러리     | 용도                                                       |
+| ------------- | --------------------------------------------------------- |
+| Next.js       | React 기반 SSR/SSG 프레임워크(App Router, 파일 기반 라우팅) |
+| React         | UI 빌딩 블록(컴포넌트 상태관리, 라이프사이클)               |
+| TypeScript    | 정적 타입 검사(Type 안전성 향상, 개발 생산성)              |
+| Tailwind CSS  | 유틸리티 클래스 기반 스타일링                              |
+| Axios         | HTTP 클라이언트(API 통신)                                  |
+| next/font     | Google Fonts 최적화(Geist 폰트 로딩)                       |
 
-### 디렉터리 구조
+## 3. 페이지 구조
+
 ```plaintext
-.
-├── app
-│   ├── admin
-│   │   ├── _api                # 관리자용 API 모듈
-│   │   ├── _components         # 관리자용 UI 컴포넌트
-│   │   └── page.tsx            # 관리자 대시보드 진입점
-│   ├── components              # 공용 컴포넌트 (QuizPlayer, UI 라이브러리)
-│   ├── lib                     # 공용 유틸리티 (Axios 인스턴스)
-│   ├── types                   # TypeScript 타입 정의
-│   ├── sections                # 섹션별 유닛 리스트 페이지
-│   ├── unit                    # 유닛별 퀴즈 리스트 페이지
-│   ├── layout.tsx              # 루트 레이아웃
-│   ├── page.tsx                # 메인 페이지
-│   └── globals.css             # 전역 스타일
-├── public                      # 정적 리소스 (SVG 등)
-├── next.config.ts              # Next.js 설정
-├── postcss.config.mjs          # PostCSS 설정
-├── package.json                # 프로젝트 메타/의존성
-├── tsconfig.json               # TypeScript 설정
-└── README.md                   # 프로젝트 문서 (이 파일)
+app/
+├─ admin/
+│  ├─ _api/               # 관리자용 API 호출 모듈 (quiz.api.ts 등)
+│  ├─ _components/        # 관리자 UI 컴포넌트(GenerateQuiz, ManageQuiz 등)
+│  │  └─ _quiz_components/ # 퀴즈 관련 내부 컴포넌트(QuizForm, QuizList...)
+│  └─ page.tsx            # 관리자 대시보드 진입점
+├─ components/            # 공용 컴포넌트(QuizPlayer, UI 컴포넌트 라이브러리)
+│  └─ ui/                 # Button, Card, Select, Tabs 등
+├─ lib/                   # 공용 유틸리티(api 인스턴스)
+├─ types/                 # TypeScript 타입 정의
+├─ sections/              # 섹션 선택 후 유닛 목록 페이지
+│  └─ [id]/page.tsx
+├─ unit/                  # 유닛 선택 후 퀴즈 목록 페이지
+│  └─ [id]/page.tsx
+├─ layout.tsx             # 루트 레이아웃 및 전역 스타일 적용
+├─ page.tsx               # 메인(Home) 페이지
+└─ globals.css            # 전역 스타일(CSS 변수, 다크모드)
 ```
 
-### 주요 파일 설명
-- **app/page.tsx**: 메인 홈 페이지, Admin 패널 진입 및 퀴즈 시작 버튼 제공
-- **app/components/QuizPlayer.tsx**: 클라이언트 컴포넌트로 `/generate/list` API 호출을 통해 퀴즈 목록을 받아와 플레이어 UI 렌더링
-- **app/lib/api.ts**: `axios.create`로 생성된 API 인스턴스를 통해 백엔드와 통신 (`NEXT_PUBLIC_API_URL` 환경 변수 사용)
-- **app/admin/_api** 폴더: 관리자 페이지에서 사용하는 API 호출 모듈
-  - `section.api.ts`, `units.api.ts`, `story.api.ts`, `vocab.api.ts`, `quiz.api.ts`
-- **app/admin/_components** 폴더: 관리자 UI 컴포넌트
-  - `ManageSections.tsx`, `ManageUnits.tsx`, `ManageStories.tsx`, `ManageVocab.tsx`, `GenerateQuiz.tsx`, `ManageQuiz.tsx`
-  - `_quiz_components` 서브 폴더: 퀴즈 관련 세부 컴포넌트 (`QuizForm.tsx`, `QuizList.tsx`, `MediaRenderer.tsx` 등)
-- **app/sections/[id]/page.tsx**: 선택한 섹션의 유닛 목록 표시
-- **app/unit/[id]/page.tsx**: 선택한 유닛의 퀴즈 목록 표시
+## 4. 주요 컴포넌트 및 API 모듈 역할
 
-### API 연결 및 사용 예시
-- **`app/lib/api.ts`** 예시
-```ts
-export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
-  headers: { "Content-Type": "application/json" },
-});
-```
-- **`app/admin/_api/section.api.ts`** 예시
-```ts
-import { api } from "../../lib/api";
+### 4-1. 공용 UI 컴포넌트 (`app/components/ui`)
+| 컴포넌트       | 설명                           |
+| ----------- | ----------------------------- |
+| `Button.tsx`| 클릭 가능한 버튼              |
+| `Card.tsx`  | 카드 레이아웃 컨테이너         |
+| `Select.tsx`| 드롭다운 셀렉트 박스           |
+| `Tabs.tsx`  | 탭 네비게이션                |
 
-export async function getAllSections(): Promise<Section[]> {
-  const res = await api.get<Section[]>("/sections");
-  return res.data;
-}
-```
-- **`app/components/QuizPlayer.tsx`** 예시
-```ts
-const API_URL = process.env.NEXT_PUBLIC_API_URL + "/generate/list";
+### 4-2. 퀴즈 플레이어 (`app/components/QuizPlayer.tsx`)
+- `/generate/list` API 호출로 퀴즈 목록 조회 후 순차적 렌더링
+- 옵션 선택/텍스트 입력 기반 응답 처리
+- 정답 검증 및 점수 집계 → CEFR 레벨(예: A1, A2, B1, B2+) 표시
 
-useEffect(() => {
-  axios.get<Quiz[]>(API_URL).then((res) => setQuizzes(res.data));
-}, []);
+### 4-3. 관리자 대시보드 컴포넌트 (`app/admin/_components`)
+| 컴포넌트             | 설명                                |
+| ------------------- | --------------------------------- |
+| `GenerateQuiz.tsx`  | CEFR, Unit 선택 후 AI 퀴즈 생성 폼    |
+| `ManageQuiz.tsx`    | 퀴즈 CRUD 관리 뷰                   |
+| `ManageSections.tsx`| 섹션(Section) CRUD 관리 뷰         |
+| `ManageUnits.tsx`   | 유닛(Unit) CRUD 관리 뷰            |
+| `ManageStories.tsx` | 스토리(Story) CRUD/AI 생성 뷰     |
+| `ManageVocab.tsx`   | 어휘(Vocab) CRUD 관리 뷰          |
+
+#### 퀴즈 내부 컴포넌트 (`app/admin/_components/_quiz_components`)
+| 컴포넌트          | 설명                                |
+| ---------------- | --------------------------------- |
+| `QuizForm.tsx`    | 퀴즈 질문/옵션/정답/설명 입력 폼     |
+| `QuizList.tsx`    | 퀴즈 리스트 테이블                  |
+| `QuizGenerator.tsx`| AI 퀴즈 생성 로직 UI               |
+| `MediaRenderer.tsx`| 이미지/미디어 렌더링 헬퍼 컴포넌트  |
+| `QuizCard.tsx`    | 퀴즈 카드 뷰                       |
+| `QuizDisplay.tsx` | 퀴즈 상세 표시                      |
+
+### 4-4. API 모듈 (`app/admin/_api`)
+| 파일              | 기능                                                        |
+| ---------------- | --------------------------------------------------------- |
+| `quiz.api.ts`    | 퀴즈 리스트 조회/단일 조회/생성/수정/삭제/AI 퀴즈 생성    |
+| `section.api.ts` | 섹션 리스트 조회/단일 조회/생성/수정/삭제                   |
+| `units.api.ts`   | 유닛 조회/생성/수정/삭제 및 유닛별 퀴즈 조회                |
+| `story.api.ts`   | 스토리 조회/생성/수정/삭제 및 AI 스토리 생성               |
+| `vocab.api.ts`   | 어휘 조회/생성/수정/삭제                                   |
+
+## 5. 설치 & 실행 방법
+
+### 요구사항
+- Node.js v14 이상
+- npm 또는 yarn
+
+### 설치
+```bash
+git clone https://github.com/{사용자명}/ai-quiz-generator.git
+cd ai-quiz-generator
+npm install
+# 또는 yarn install
 ```
 
 ### 환경 변수
+`.env.local` 파일에 백엔드 API 주소를 설정합니다:
 ```dotenv
-NEXT_PUBLIC_API_URL=http://localhost:3001  # 백엔드 API 서버 주소
+NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
-### 로컬 개발 및 배포
+### 개발 서버 실행
 ```bash
-# 의존성 설치
-npm install
-
-# 개발 서버 실행
 npm run dev
+# 또는 yarn dev
+```
+브라우저에서 `http://localhost:3000` 접속
 
-# 빌드
+### 빌드 및 프로덕션
+```bash
 npm run build
-
-# 프로덕션 서버 실행
 npm run start
 ```
 
 ---
-본 문서는 인수인계 목적으로 작성되었습니다.
+*본 문서는 AI Quiz Generator 프로젝트의 원활한 인수인계를 위해 작성되었습니다.*
